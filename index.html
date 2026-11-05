@@ -273,38 +273,7 @@ footer{background:#fff;border-top-color:#eee;color:#777}
 </div>
 
 <footer>Madrugadão Lanches · Somente delivery · Rua Venâncio Raimundo, 857, Mangueiral, Horizonte-CE</footer>
-<div class="admin-footer"><button class="admin-launch" type="button" onclick="toggleAdmin()">🔐 Área do administrador</button>
-<section id="adminPanel" class="admin-panel" hidden>
- <h2>Administração do cardápio</h2>
- <div id="adminLogin">
-  <p>Entre com o e-mail autorizado para administrar os produtos.</p>
-  <label for="adminEmail">E-mail</label><input id="adminEmail" type="email" value="lucasalmeidade9229@gmail.com" autocomplete="username">
-  <label for="adminPassword">Senha</label><input id="adminPassword" type="password" placeholder="Sua senha do Supabase" autocomplete="current-password">
-  <div class="admin-actions"><button type="button" onclick="adminSignIn()">Entrar</button></div>
- </div>
- <div id="adminTools" hidden>
-  <p id="adminWelcome"></p>
-  <div id="driverTrackingTools">
-   <h3 style="margin:0 0 6px">📍 Rastreamento GPS da entrega</h3>
-   <p style="font-size:13px;color:#666;margin:0 0 8px">Depois de receber o pedido pelo WhatsApp, copie o código do link de rastreamento recebido e cole abaixo. Depois, inicie o GPS. Mantenha esta página aberta durante a entrega.</p>
-   <label for="driverTrackingToken">Código do rastreamento (token)</label>
-   <input id="driverTrackingToken" type="text" placeholder="Cole aqui o código do link recebido no pedido">
-   <button type="button" onclick="startDriverTracking()">Iniciar GPS desta entrega</button>
-   <button type="button" onclick="stopDriverTracking()">Encerrar compartilhamento</button>
-   <div id="driverTrackingMessage" role="status">Aguardando início da entrega.</div>
-  </div>
-  <div class="admin-grid">
-   <div><label for="newProductName">Nome do produto</label><input id="newProductName" placeholder="Ex.: Pastel de frango"></div>
-   <div><label for="newProductPrice">Preço (R$)</label><input id="newProductPrice" type="number" min="0" step="0.01" placeholder="7,00"></div>
-   <div><label for="newProductCategory">Categoria</label><input id="newProductCategory" placeholder="Ex.: Pastéis"></div>
-   <div><label for="newProductPhoto">Foto do produto</label><input id="newProductPhoto" type="file" accept="image/*"></div>
-  </div>
-  <label for="newProductDesc">Descrição</label><textarea id="newProductDesc" placeholder="Descrição do produto"></textarea>
-  <div class="admin-actions"><button type="button" onclick="saveAdminProduct()">Salvar produto</button><button type="button" onclick="adminSignOut()">Sair</button></div>
-  <div id="adminStatus" class="admin-status" role="status"></div>
-  <div id="adminProductList" class="admin-list"></div>
- </div>
-</section></div>
+
 
 <script>
 const products = [{"id": "coxinha", "name": "Coxinha de Frango 150 Gramas", "desc": "Bem recheada", "price": 7.0, "cat": "Salgados"}, {"id": "enroladinho", "name": "Enroladinho", "desc": "Massa super deliciosa", "price": 6.0, "cat": "Salgados"}, {"id": "pastel_calabresa", "name": "Pastel de Calabresa", "desc": "", "price": 7.0, "cat": "Pastéis tamanho Normal"}, {"id": "pastel_queijo", "name": "Pastel de Queijo", "desc": "Duas fatias de queijo", "price": 7.0, "cat": "Pastéis tamanho Normal"}, {"id": "pastel_misto", "name": "Pastel misto", "desc": "Fatia de queijo e fatia de presunto", "price": 7.0, "cat": "Pastéis tamanho Normal"}, {"id": "pastelao_queijo", "name": "Pastelão de Queijo", "desc": "Pastelão grande bem recheado", "price": 15.0, "cat": "Pastelões"}, {"id": "pastelao_misto", "name": "Pastelão Misto", "desc": "", "price": 15.0, "cat": "Pastelões"}];
@@ -832,7 +801,7 @@ function initializeCustomerTracking(){
  document.querySelector('header').style.display='none';
  document.querySelector('main').style.display='none';
  document.querySelector('footer').style.display='none';
- document.querySelector('.admin-footer').style.display='none';
+ document.querySelector('.admin-footer')?.style.setProperty('display','none');
  document.getElementById('liveTrackingPage').style.display='block';
  document.title='Rastreamento da entrega | Madrugadão Lanches';
  loadCustomerTrackingPosition(token);
