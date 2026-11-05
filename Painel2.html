@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17120f">
+<title>Central administrativa | Madrugadão Lanches</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#f7f2ed;background:#100e0c;--panel:#1b1714;--panel2:#241e19;--line:#382e27;--muted:#b7a99e;--orange:#f07835;--green:#35b879;--red:#e45c55}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#392014 0,#100e0c 45%);min-height:100vh}
+.wrap{max-width:1180px;margin:auto;padding:22px 18px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;border:1px solid #52311f;border-radius:22px;background:linear-gradient(115deg,#2b1b13,#191512);box-shadow:0 18px 55px #0005;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:54px;height:54px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#ff9b52,#d94e20);font-size:28px;box-shadow:0 8px 24px #e65c2b44}
+h1{font-size:clamp(22px,4vw,31px);margin:0;letter-spacing:-.7px}header p{margin:5px 0 0;color:#c9b6a7;font-size:13px}.header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.live-pill{font-size:12px;border:1px solid #3b634d;background:#14271d;color:#8ee0b1;padding:8px 11px;border-radius:99px}
+.card{background:linear-gradient(145deg,#211b17,#191512);border:1px solid var(--line);border-radius:19px;padding:20px;margin:16px 0;box-shadow:0 12px 32px #0002}
+h2{font-size:19px;margin:0 0 5px;letter-spacing:-.3px}h3{font-size:15px;margin:0 0 8px}.muted{color:var(--muted);font-size:13px;line-height:1.55}.status{font-size:13px;line-height:1.5;margin-top:10px;color:#8ee0b1;overflow-wrap:anywhere}.status.error{color:#ff938b}
+label{display:block;font-size:12px;font-weight:750;margin:12px 0 6px;color:#d7c8bd}input,textarea,select{width:100%;border:1px solid #4a3c32;border-radius:11px;padding:12px 13px;font:inherit;color:#f7f2ed;background:#130f0d;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px #f0783520}
+button{border:0;border-radius:11px;padding:11px 14px;background:linear-gradient(135deg,#ff914b,#dc5427);color:#1b100b;font-weight:850;font-size:13px;cursor:pointer;margin:6px 5px 0 0;transition:.15s}button:hover{filter:brightness(1.08);transform:translateY(-1px)}button.secondary{background:#342a23;color:#f0dfd2;border:1px solid #594638}button.green{background:linear-gradient(135deg,#61d69a,#25a96c);color:#082416}button.danger{background:#58231f;color:#ffd2cd;border:1px solid #873a34}button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.hidden{display:none!important}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric{padding:17px;border:1px solid #423229;border-radius:16px;background:linear-gradient(145deg,#2a211b,#1b1714)}.metric small{display:block;color:#b9a89b;font-size:12px}.metric strong{display:block;font-size:27px;margin-top:5px;letter-spacing:-1px}.metric.orange strong{color:#ff9a5d}.metric.green strong{color:#68d99f}.metric.blue strong{color:#8dc9f7}
+.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:14px 0}.filters{display:flex;gap:8px;flex-wrap:wrap}.filters select{width:auto;min-width:165px}.order-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.order{border:1px solid #43352b;border-radius:16px;background:#191512;padding:16px;min-width:0}.order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.order-number{font-weight:900;font-size:14px;color:#ffad79;overflow-wrap:anywhere}.order-time{font-size:11px;color:#aa9a8e;margin-top:4px}.status-tag{display:inline-block;padding:6px 9px;border-radius:99px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.35px;background:#382a20;color:#ffbd8f;white-space:nowrap}.status-tag.novo{background:#493018;color:#ffc28c}.status-tag.aceito{background:#20384a;color:#9bd3ff}.status-tag.em_preparo{background:#40351d;color:#f8d77c}.status-tag.saiu_entrega{background:#193b31;color:#8ee0b1}.status-tag.concluido{background:#26342a;color:#a5dcae}.status-tag.cancelado{background:#492321;color:#ffaaa2}
+.order h3{margin:12px 0 4px;font-size:17px}.order-meta{color:#c6b7ac;font-size:12px;line-height:1.55;overflow-wrap:anywhere}.items{border-top:1px solid #382e27;border-bottom:1px solid #382e27;padding:10px 0;margin:10px 0;color:#e7dcd4;font-size:12px;line-height:1.7}.order-total{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:17px}.order-total span:last-child{color:#ffad79}.order-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}.order-actions button{font-size:11px;padding:9px 10px;margin:3px 2px 0 0}.order-actions select{flex:1;min-width:140px;padding:8px;font-size:12px}
+#gpsBox{background:linear-gradient(130deg,#1b3026,#19231d);border:1px solid #315640;border-radius:15px;padding:16px;margin-top:14px}.gps-grid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.product{display:flex;gap:11px;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #342b25;flex-wrap:wrap}.product img{width:50px;height:50px;object-fit:cover;border-radius:10px}.product-info{flex:1;min-width:140px;font-size:13px}.product-actions{display:flex;gap:5px;flex-wrap:wrap}.product-actions button{padding:8px 10px;margin:0;background:#342a23;color:#f0dfd2}.product-actions button.danger{background:#58231f;color:#ffd2cd}
+.empty{padding:30px 15px;text-align:center;border:1px dashed #594638;border-radius:14px;color:#bba99c;font-size:13px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.section-head p{margin:4px 0 0}
+#loginCard{max-width:480px;margin:7vh auto}.login-mark{text-align:center;font-size:42px;margin-bottom:8px}.login-card-title{text-align:center}.login-card-title p{margin:7px 0 18px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.order-list{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}.header-right{width:100%;justify-content:space-between}}
+@media(max-width:420px){.wrap{padding:12px 10px 40px}.card{padding:15px}.grid{gap:8px}.metric{padding:13px}.metric strong{font-size:23px}.gps-grid{grid-template-columns:1fr}.filters select{width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="brand"><div class="logo">🌙</div><div><h1>Madrugadão Lanches</h1><p>Central de operações · Pedidos, entregas e cardápio</p></div></div>
+ <div class="header-right"><span class="live-pill">● Painel privado</span><button class="secondary" type="button" onclick="refreshAll()">↻ Atualizar</button></div>
+</header>
+
+<section class="card" id="loginCard">
+ <div class="login-mark">🔐</div><div class="login-card-title"><h2>Acesso do administrador</h2><p class="muted">Entre com a conta autorizada no Supabase para visualizar os pedidos.</p></div>
+ <label for="adminEmail">E-mail</label><input id="adminEmail" type="email" value="lucasalmeidade9229@gmail.com" autocomplete="username">
+ <label for="adminPassword">Senha</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Sua senha do Supabase">
+ <button type="button" style="width:100%;margin-top:14px" onclick="adminSignIn()">Entrar no painel</button><div id="loginStatus" class="status" role="status"></div>
+</section>
+
+<div id="adminArea" class="hidden">
+ <section class="grid" aria-label="Resumo dos pedidos">
+  <div class="metric orange"><small>Pedidos de hoje</small><strong id="metricToday">0</strong></div>
+  <div class="metric"><small>Novos / aguardando</small><strong id="metricNew">0</strong></div>
+  <div class="metric blue"><small>Em preparo</small><strong id="metricPrep">0</strong></div>
+  <div class="metric green"><small>Em entrega</small><strong id="metricDelivery">0</strong></div>
+ </section>
+
+ <section class="card">
+  <div class="section-head"><div><h2>🧾 Pedidos recebidos</h2><p class="muted">Os pedidos novos aparecem automaticamente a cada 10 segundos.</p></div><button class="secondary" type="button" onclick="loadOrders()">↻ Atualizar pedidos</button></div>
+  <div class="toolbar"><div class="filters">
+   <select id="statusFilter" onchange="renderOrders()"><option value="todos">Todos os status</option><option value="novo">Novos</option><option value="aceito">Aceitos</option><option value="em_preparo">Em preparo</option><option value="saiu_entrega">Saiu para entrega</option><option value="concluido">Concluídos</option><option value="cancelado">Cancelados</option></select>
+   <select id="orderSort" onchange="renderOrders()"><option value="recentes">Mais recentes</option><option value="antigos">Mais antigos</option></select>
+  </div><span class="muted" id="lastOrdersUpdate">Aguardando dados...</span></div>
+  <div id="ordersList" class="order-list"><div class="empty">Entre no painel para carregar os pedidos.</div></div>
+  <div id="ordersStatus" class="status" role="status"></div>
+ </section>
+
+ <section class="card">
+  <h2>📍 Transmissão do rastreamento GPS</h2>
+  <p class="muted">Escolha um pedido na lista para preencher o código. Toque em transmitir ao sair para entrega. Mantenha esta página aberta e permita a localização no celular.</p>
+  <div id="gpsBox">
+   <div class="gps-grid"><div><label for="driverTrackingToken">Código do rastreamento do pedido</label><input id="driverTrackingToken" type="text" placeholder="Selecione um pedido ou cole o código"></div><div><button class="green" type="button" onclick="startDriverTracking()">▶ Transmitir rastreamento</button></div></div>
+   <button class="danger" type="button" onclick="stopDriverTracking()">■ Encerrar rastreamento</button>
+   <div id="driverTrackingMessage" class="status" role="status">Nenhuma localização sendo transmitida.</div>
+  </div>
+ </section>
+
+ <section class="card">
+  <h2>➕ Cadastrar produto</h2>
+  <div class="grid"><div><label for="newProductName">Nome do produto</label><input id="newProductName" placeholder="Ex.: Pastel de frango"></div><div><label for="newProductPrice">Preço (R$)</label><input id="newProductPrice" type="number" min="0" step="0.01" placeholder="7,00"></div><div><label for="newProductCategory">Categoria</label><input id="newProductCategory" placeholder="Ex.: Pastéis"></div><div><label for="newProductPhoto">Foto do produto</label><input id="newProductPhoto" type="file" accept="image/*"></div></div>
+  <label for="newProductDesc">Descrição</label><textarea id="newProductDesc" rows="2" placeholder="Descrição do produto"></textarea>
+  <button type="button" onclick="saveAdminProduct()">Salvar produto</button><div id="adminStatus" class="status" role="status"></div>
+ </section>
+ <section class="card"><div class="section-head"><h2>📋 Produtos cadastrados</h2><button class="secondary" type="button" onclick="loadAdminProducts()">Atualizar produtos</button></div><div id="adminProductList" class="muted">Carregando...</div></section>
+ <section class="card"><button class="secondary" type="button" onclick="adminSignOut()">Sair da administração</button></section>
+</div>
+</div>
+
+<script>
+const SUPABASE_URL='https://follkpjemvqcprfikqtt.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_c7iKENeX7w4pNIvBGlppeQ_FpHo8C_B';
+const ADMIN_EMAIL='lucasalmeidade9229@gmail.com';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let driverGpsWatchId=null,driverGpsToken=null,ordersCache=[],ordersTimer=null;
+
+function setStatus(id,msg,error=false){const el=document.getElementById(id);if(el){el.textContent=msg;el.className='status'+(error?' error':'');}}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function formatDate(v){try{return new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});}catch(e){return v||'';}}
+function statusLabel(s){return ({novo:'Novo',aceito:'Aceito',em_preparo:'Em preparo',saiu_entrega:'Saiu para entrega',concluido:'Concluído',cancelado:'Cancelado'})[s]||s;}
+async function adminSignIn(){
+ const email=document.getElementById('adminEmail').value.trim(),password=document.getElementById('adminPassword').value;
+ setStatus('loginStatus','Verificando acesso...');
+ const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+ if(error){setStatus('loginStatus','Não foi possível entrar: '+error.message,true);return;}
+ if(data.user.email!==ADMIN_EMAIL){await supabaseClient.auth.signOut();setStatus('loginStatus','Este e-mail não está autorizado.',true);return;}
+ document.getElementById('loginCard').classList.add('hidden');document.getElementById('adminArea').classList.remove('hidden');
+ await refreshAll();
+ if(ordersTimer)clearInterval(ordersTimer);
+ ordersTimer=setInterval(loadOrders,10000);
+}
+async function adminSignOut(){
+ if(ordersTimer){clearInterval(ordersTimer);ordersTimer=null;}
+ await stopDriverTracking();await supabaseClient.auth.signOut();
+ document.getElementById('adminArea').classList.add('hidden');document.getElementById('loginCard').classList.remove('hidden');document.getElementById('adminPassword').value='';
+}
+async function refreshAll(){await Promise.all([loadOrders(),loadAdminProducts()]);}
+async function loadOrders(){
+ const {data,error}=await supabaseClient.from('pedidos').select('*').order('criado_em',{ascending:false});
+ if(error){setStatus('ordersStatus','Erro ao carregar pedidos: '+error.message,true);return;}
+ ordersCache=data||[];renderOrders();updateMetrics();
+ document.getElementById('lastOrdersUpdate').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR');
+}
+function updateMetrics(){
+ const today=new Date();today.setHours(0,0,0,0);
+ const todays=ordersCache.filter(o=>new Date(o.criado_em)>=today);
+ document.getElementById('metricToday').textContent=todays.length;
+ document.getElementById('metricNew').textContent=ordersCache.filter(o=>['novo','aceito'].includes(o.status)).length;
+ document.getElementById('metricPrep').textContent=ordersCache.filter(o=>o.status==='em_preparo').length;
+ document.getElementById('metricDelivery').textContent=ordersCache.filter(o=>o.status==='saiu_entrega').length;
+}
+function renderOrders(){
+ const list=document.getElementById('ordersList'),filter=document.getElementById('statusFilter').value,sort=document.getElementById('orderSort').value;
+ let rows=ordersCache.filter(o=>filter==='todos'||o.status===filter);
+ rows.sort((a,b)=>sort==='recentes'?new Date(b.criado_em)-new Date(a.criado_em):new Date(a.criado_em)-new Date(b.criado_em));
+ if(!rows.length){list.innerHTML='<div class="empty" style="grid-column:1/-1">Nenhum pedido encontrado neste filtro.</div>';return;}
+ list.innerHTML=rows.map(o=>{
+  const items=Array.isArray(o.itens)?o.itens:[];
+  const lines=items.map(i=>`<div>${Number(i.quantidade||0)}× ${escapeHtml(i.nome||'Produto')} <span style="color:#ffbd8f">· ${money(i.total??(Number(i.preco_unitario||0)*Number(i.quantidade||0)))}</span></div>`).join('');
+  const token=escapeHtml(o.tracking_token||'');
+  const trackBtn=token?`<button class="green" type="button" onclick="selectOrderForTracking('${token}')">📍 Transmitir GPS</button>`:'';
+  const mapLink=(o.tracking_link)?`<button class="secondary" type="button" onclick="openTrackingLink('${encodeURIComponent(o.tracking_link)}')">Abrir mapa do cliente</button>`:'';
+  return `<article class="order">
+   <div class="order-top"><div><div class="order-number">PEDIDO ${escapeHtml(String(o.id).slice(0,8).toUpperCase())}</div><div class="order-time">${formatDate(o.criado_em)}</div></div><span class="status-tag ${escapeHtml(o.status)}">${statusLabel(o.status)}</span></div>
+   <h3>${escapeHtml(o.cliente_nome)}</h3><div class="order-meta">📍 ${escapeHtml(o.endereco)}<br>🏘️ ${escapeHtml(o.bairro)}<br>💳 ${escapeHtml(o.pagamento)}</div>
+   <div class="items">${lines||'Itens não informados'}</div>
+   <div class="order-meta">Subtotal: ${money(o.subtotal)} · Entrega: ${money(o.taxa_entrega)}</div>
+   <div class="order-total"><span>Total</span><span>${money(o.total)}</span></div>
+   <div class="order-actions"><select aria-label="Status do pedido" id="status-${escapeHtml(o.id)}">
+    ${['novo','aceito','em_preparo','saiu_entrega','concluido','cancelado'].map(s=>`<option value="${s}" ${s===o.status?'selected':''}>${statusLabel(s)}</option>`).join('')}
+   </select><button type="button" onclick="updateOrderStatus('${escapeHtml(o.id)}')">Salvar status</button></div>
+   <div class="order-actions">${trackBtn}${mapLink}</div>
+  </article>`;
+ }).join('');
+}
+function openTrackingLink(encoded){const url=decodeURIComponent(encoded);if(url.startsWith('https://'))window.open(url,'_blank','noopener');}
+function selectOrderForTracking(token){document.getElementById('driverTrackingToken').value=token;document.getElementById('gpsBox').scrollIntoView({behavior:'smooth',block:'center'});setStatus('driverTrackingMessage','Pedido selecionado. Toque em “Transmitir rastreamento” para compartilhar o GPS.');}
+async function updateOrderStatus(id){
+ const value=document.getElementById('status-'+id).value;
+ const {error}=await supabaseClient.from('pedidos').update({status:value}).eq('id',id);
+ if(error){setStatus('ordersStatus','Não foi possível atualizar o pedido: '+error.message,true);return;}
+ setStatus('ordersStatus','Status do pedido atualizado.');await loadOrders();
+}
+function trackingMessage(msg,error=false){setStatus('driverTrackingMessage',msg,error);}
+async function startDriverTracking(){
+ const token=(document.getElementById('driverTrackingToken').value||'').trim();
+ if(!token){trackingMessage('Selecione um pedido ou cole o código do rastreamento.',true);return;}
+ const {data:{session}}=await supabaseClient.auth.getSession();
+ if(!session||session.user.email!==ADMIN_EMAIL){trackingMessage('Entre com a conta autorizada antes de iniciar o GPS.',true);return;}
+ if(!navigator.geolocation){trackingMessage('Este navegador não oferece acesso ao GPS.',true);return;}
+ if(driverGpsWatchId!==null)await stopDriverTracking();
+ driverGpsToken=token;trackingMessage('Solicitando permissão de localização do celular...');
+ driverGpsWatchId=navigator.geolocation.watchPosition(async pos=>{
+  if(!driverGpsToken)return;
+  const row={tracking_token:driverGpsToken,latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy_m:Math.round(pos.coords.accuracy||0),ativo:true,atualizado_em:new Date().toISOString()};
+  const {error}=await supabaseClient.from('rastreamento_entregas').upsert(row,{onConflict:'tracking_token'});
+  if(error){trackingMessage('GPS capturado, mas não foi salvo: '+error.message,true);return;}
+  trackingMessage('Transmitindo GPS deste pedido. Última atualização: '+new Date().toLocaleTimeString('pt-BR')+'. Mantenha o painel aberto durante a entrega.');
+ },err=>{trackingMessage('Não foi possível obter o GPS: '+err.message+'. Confira a permissão de localização do navegador.',true);driverGpsWatchId=null;},{enableHighAccuracy:true,maximumAge:3000,timeout:20000});
+}
+async function stopDriverTracking(){
+ if(driverGpsWatchId!==null&&navigator.geolocation){navigator.geolocation.clearWatch(driverGpsWatchId);driverGpsWatchId=null;}
+ const token=driverGpsToken||(document.getElementById('driverTrackingToken')?.value||'').trim();driverGpsToken=null;
+ if(token){const {error}=await supabaseClient.from('rastreamento_entregas').upsert({tracking_token:token,latitude:0,longitude:0,accuracy_m:0,ativo:false,atualizado_em:new Date().toISOString()},{onConflict:'tracking_token'});if(error){trackingMessage('GPS parado neste celular, mas não foi possível encerrar no banco: '+error.message,true);return;}}
+ trackingMessage('Compartilhamento de localização encerrado.');
+}
+async function loadAdminProducts(){
+ const {data,error}=await supabaseClient.from('produtos').select('*').order('id');
+ if(error){setStatus('adminStatus','Erro ao carregar produtos: '+error.message,true);return;}
+ const list=document.getElementById('adminProductList');
+ list.innerHTML=(data||[]).map(p=>`<div class="product">${p.foto_url?`<img src="${escapeHtml(p.foto_url)}" alt="">`:''}<div class="product-info"><b>${escapeHtml(p.nome)}</b><br>${money(p.preco)} · ${p.disponivel?'Disponível':'Pausado'}</div><div class="product-actions"><button type="button" onclick="toggleProductAvailability(${Number(p.id)},${!p.disponivel})">${p.disponivel?'Pausar':'Ativar'}</button><button class="danger" type="button" onclick="deleteAdminProduct(${Number(p.id)})">Excluir</button></div></div>`).join('')||'Nenhum produto cadastrado.';
+}
+async function saveAdminProduct(){
+ const nome=document.getElementById('newProductName').value.trim(),preco=Number(document.getElementById('newProductPrice').value),descricao=document.getElementById('newProductDesc').value.trim(),categoria=document.getElementById('newProductCategory').value.trim()||'Outros',file=document.getElementById('newProductPhoto').files[0];
+ if(!nome||!Number.isFinite(preco)||preco<0){setStatus('adminStatus','Informe nome e preço válidos.',true);return;}
+ let foto_url=null;
+ if(file){const safeName=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const {error}=await supabaseClient.storage.from('fotos-produtos').upload(safeName,file,{upsert:true});if(error){setStatus('adminStatus','Erro ao enviar foto: '+error.message,true);return;}foto_url=supabaseClient.storage.from('fotos-produtos').getPublicUrl(safeName).data.publicUrl;}
+ const {error}=await supabaseClient.from('produtos').insert({nome,descricao,preco,categoria,foto_url,disponivel:true});
+ if(error){setStatus('adminStatus','Erro ao salvar: '+error.message,true);return;}
+ ['newProductName','newProductPrice','newProductDesc','newProductCategory','newProductPhoto'].forEach(id=>document.getElementById(id).value='');setStatus('adminStatus','Produto salvo com sucesso.');await loadAdminProducts();
+}
+async function toggleProductAvailability(id,disponivel){const {error}=await supabaseClient.from('produtos').update({disponivel}).eq('id',id);if(error){setStatus('adminStatus','Erro ao atualizar: '+error.message,true);return;}await loadAdminProducts();}
+async function deleteAdminProduct(id){if(!confirm('Deseja excluir este produto?'))return;const {error}=await supabaseClient.from('produtos').delete().eq('id',id);if(error){setStatus('adminStatus','Erro ao excluir: '+error.message,true);return;}setStatus('adminStatus','Produto excluído.');await loadAdminProducts();}
+</script>
+</body></html>
